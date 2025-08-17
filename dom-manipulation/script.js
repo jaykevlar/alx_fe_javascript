@@ -167,7 +167,8 @@ function importFromJsonFile(event) {
 // -------- Simulated Server Interaction --------
 const SERVER_URL = "https://jsonplaceholder.typicode.com/posts";
 
-function fetchServerQuotes() {
+// Fetch quotes from server (ALX-compliant function)
+function fetchQuotesFromServer() {
   fetch(SERVER_URL)
     .then(response => response.json())
     .then(serverData => {
@@ -178,9 +179,21 @@ function fetchServerQuotes() {
 
       resolveConflicts(serverQuotes);
     })
-    .catch(err => console.error("Error fetching server quotes:", err));
+    .catch(err => console.error("Error fetching quotes from server:", err));
 }
 
+// Sync local quotes to server (ALX-compliant function)
+function syncQuotes() {
+  quotes.forEach(quote => {
+    fetch(SERVER_URL, {
+      method: "POST",
+      body: JSON.stringify(quote),
+      headers: { "Content-type": "application/json; charset=UTF-8" }
+    }).catch(err => console.error("Error syncing quotes to server:", err));
+  });
+}
+
+// -------- Conflict Resolution --------
 function resolveConflicts(serverQuotes) {
   let newQuotes = serverQuotes.filter(
     sq => !quotes.some(lq => lq.text === sq.text && lq.category === sq.category)
@@ -195,25 +208,16 @@ function resolveConflicts(serverQuotes) {
   }
 }
 
+// -------- Notification --------
 function notifyUser(count) {
   const notification = document.getElementById("syncNotification");
   notification.textContent = `${count} new quote(s) synced from server!`;
   setTimeout(() => { notification.textContent = ""; }, 5000);
 }
 
-function syncLocalToServer() {
-  quotes.forEach(quote => {
-    fetch(SERVER_URL, {
-      method: "POST",
-      body: JSON.stringify(quote),
-      headers: { "Content-type": "application/json; charset=UTF-8" }
-    }).catch(err => console.error("Error syncing to server:", err));
-  });
-}
-
-// Start periodic sync
-setInterval(fetchServerQuotes, 30000); // fetch every 30s
-setInterval(syncLocalToServer, 60000); // push local changes every 60s
+// -------- Start Periodic Sync --------
+setInterval(fetchQuotesFromServer, 30000); // fetch every 30s
+setInterval(syncQuotes, 60000);             // push local changes every 60s
 
 // -------- Initialize --------
 loadQuotes();
