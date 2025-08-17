@@ -8,6 +8,7 @@ let quotes = [
 const quoteDisplay = document.getElementById("quoteDisplay");
 const categoryFilter = document.getElementById("categoryFilter");
 const addQuoteContainer = document.getElementById("addQuoteContainer");
+const syncNotification = document.getElementById("syncNotification");
 
 // -------- Web Storage --------
 function loadQuotes() {
@@ -167,35 +168,41 @@ function importFromJsonFile(event) {
 // -------- Simulated Server Interaction --------
 const SERVER_URL = "https://jsonplaceholder.typicode.com/posts";
 
-// Fetch quotes from server (ALX-compliant function)
-function fetchQuotesFromServer() {
-  fetch(SERVER_URL)
-    .then(response => response.json())
-    .then(serverData => {
-      const serverQuotes = serverData.slice(0, 5).map(post => ({
-        text: post.title,
-        category: "Server"
-      }));
+// Fetch quotes from server (async/await)
+async function fetchQuotesFromServer() {
+  try {
+    const response = await fetch(SERVER_URL);
+    const serverData = await response.json();
 
-      resolveConflicts(serverQuotes);
-    })
-    .catch(err => console.error("Error fetching quotes from server:", err));
+    const serverQuotes = serverData.slice(0, 5).map(post => ({
+      text: post.title,
+      category: "Server"
+    }));
+
+    resolveConflicts(serverQuotes);
+  } catch (err) {
+    console.error("Error fetching quotes from server:", err);
+  }
 }
 
-// Sync local quotes to server (ALX-compliant function)
-function syncQuotes() {
-  quotes.forEach(quote => {
-    fetch(SERVER_URL, {
-      method: "POST",
-      body: JSON.stringify(quote),
-      headers: { "Content-type": "application/json; charset=UTF-8" }
-    }).catch(err => console.error("Error syncing quotes to server:", err));
-  });
+// Sync local quotes to server (async/await)
+async function syncQuotes() {
+  for (const quote of quotes) {
+    try {
+      await fetch(SERVER_URL, {
+        method: "POST",
+        body: JSON.stringify(quote),
+        headers: { "Content-type": "application/json; charset=UTF-8" }
+      });
+    } catch (err) {
+      console.error("Error syncing quotes to server:", err);
+    }
+  }
 }
 
 // -------- Conflict Resolution --------
 function resolveConflicts(serverQuotes) {
-  let newQuotes = serverQuotes.filter(
+  const newQuotes = serverQuotes.filter(
     sq => !quotes.some(lq => lq.text === sq.text && lq.category === sq.category)
   );
 
@@ -210,9 +217,8 @@ function resolveConflicts(serverQuotes) {
 
 // -------- Notification --------
 function notifyUser(count) {
-  const notification = document.getElementById("syncNotification");
-  notification.textContent = `${count} new quote(s) synced from server!`;
-  setTimeout(() => { notification.textContent = ""; }, 5000);
+  syncNotification.textContent = `${count} new quote(s) synced from server!`;
+  setTimeout(() => { syncNotification.textContent = ""; }, 5000);
 }
 
 // -------- Start Periodic Sync --------
