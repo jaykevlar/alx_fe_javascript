@@ -24,11 +24,6 @@ function saveLastQuote(quote) {
   sessionStorage.setItem("lastQuote", JSON.stringify(quote));
 }
 
-function getLastQuote() {
-  const stored = sessionStorage.getItem("lastQuote");
-  return stored ? JSON.parse(stored) : null;
-}
-
 // -------- Display Random Quote --------
 function showRandomQuote() {
   const selectedCategory = categoryFilter.value;
@@ -208,13 +203,13 @@ function resolveConflicts(serverQuotes) {
     saveQuotes();
     populateCategories();
     filterQuotes();
-    notifyUser(newQuotes.length);
+    notifyUser(); // triggers exact ALX notification
   }
 }
 
 // -------- Notification --------
-function notifyUser(count) {
-  syncNotification.textContent = `${count} new quote(s) synced from server!`;
+function notifyUser() {
+  syncNotification.textContent = "Quotes synced with server!"; // exact ALX-required text
   setTimeout(() => { syncNotification.textContent = ""; }, 5000);
 }
 
