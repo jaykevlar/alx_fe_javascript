@@ -164,6 +164,57 @@ function importFromJsonFile(event) {
   fileReader.readAsText(event.target.files[0]);
 }
 
+// -------- Simulated Server Interaction --------
+const SERVER_URL = "https://jsonplaceholder.typicode.com/posts";
+
+function fetchServerQuotes() {
+  fetch(SERVER_URL)
+    .then(response => response.json())
+    .then(serverData => {
+      const serverQuotes = serverData.slice(0, 5).map(post => ({
+        text: post.title,
+        category: "Server"
+      }));
+
+      resolveConflicts(serverQuotes);
+    })
+    .catch(err => console.error("Error fetching server quotes:", err));
+}
+
+function resolveConflicts(serverQuotes) {
+  let newQuotes = serverQuotes.filter(
+    sq => !quotes.some(lq => lq.text === sq.text && lq.category === sq.category)
+  );
+
+  if (newQuotes.length > 0) {
+    quotes.push(...newQuotes);
+    saveQuotes();
+    populateCategories();
+    filterQuotes();
+    notifyUser(newQuotes.length);
+  }
+}
+
+function notifyUser(count) {
+  const notification = document.getElementById("syncNotification");
+  notification.textContent = `${count} new quote(s) synced from server!`;
+  setTimeout(() => { notification.textContent = ""; }, 5000);
+}
+
+function syncLocalToServer() {
+  quotes.forEach(quote => {
+    fetch(SERVER_URL, {
+      method: "POST",
+      body: JSON.stringify(quote),
+      headers: { "Content-type": "application/json; charset=UTF-8" }
+    }).catch(err => console.error("Error syncing to server:", err));
+  });
+}
+
+// Start periodic sync
+setInterval(fetchServerQuotes, 30000); // fetch every 30s
+setInterval(syncLocalToServer, 60000); // push local changes every 60s
+
 // -------- Initialize --------
 loadQuotes();
 createAddQuoteForm();
