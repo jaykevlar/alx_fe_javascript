@@ -11,24 +11,23 @@
   <!-- Quote Display -->
   <div id="quoteDisplay"></div>
 
-  <!-- Show Random Quote Button -->
-  <button id="newQuote" onclick="showRandomQuote()">Show New Quote</button>
-
-  <!-- Add Quote Form Container -->
-  <div id="addQuoteContainer"></div>
-
-  <!-- Export/Import -->
-  <button id="exportBtn" onclick="exportToJsonFile()">Export Quotes</button>
-  <input type="file" id="importFile" accept=".json" onchange="importFromJsonFile(event)" />
-
-  <!-- Category Filter Dropdown -->
-  <label for="categoryFilter">Filter by Category:</label>
+  <!-- Category Filter -->
   <select id="categoryFilter" onchange="filterQuotes()">
     <option value="all">All Categories</option>
   </select>
 
-  <!-- Sync Notification -->
-  <div id="syncNotification" style="color: green; margin: 10px 0;"></div>
+  <!-- New Quote Form Container -->
+  <div id="addQuoteContainer"></div>
+
+  <!-- Import/Export JSON -->
+  <button onclick="exportToJsonFile()">Export Quotes</button>
+  <input type="file" id="importFile" accept=".json" onchange="importFromJsonFile(event)" />
+
+  <!-- Notification for sync/conflicts -->
+  <div id="syncNotification" style="color: green; margin-top: 10px;"></div>
+
+  <!-- Show New Quote Button -->
+  <button id="newQuote" onclick="showRandomQuote()">Show New Quote</button>
 
   <script src="script.js"></script>
 </body>
