@@ -10,7 +10,31 @@ const newQuoteBtn = document.getElementById("newQuote");
 const categorySelect = document.getElementById("categorySelect");
 const addQuoteContainer = document.getElementById("addQuoteContainer");
 
-// Display a random quote (ALX expects this function name)
+// -------- Web Storage --------
+
+// Load quotes from local storage
+function loadQuotes() {
+  const storedQuotes = localStorage.getItem("quotes");
+  if (storedQuotes) quotes = JSON.parse(storedQuotes);
+}
+
+// Save quotes to local storage
+function saveQuotes() {
+  localStorage.setItem("quotes", JSON.stringify(quotes));
+}
+
+// Save last viewed quote to session storage
+function saveLastQuote(quote) {
+  sessionStorage.setItem("lastQuote", JSON.stringify(quote));
+}
+
+// Get last viewed quote from session storage
+function getLastQuote() {
+  const stored = sessionStorage.getItem("lastQuote");
+  return stored ? JSON.parse(stored) : null;
+}
+
+// -------- Display Random Quote --------
 function showRandomQuote() {
   let selectedCategory = categorySelect.value;
   let filteredQuotes = selectedCategory === "all" 
@@ -22,27 +46,27 @@ function showRandomQuote() {
     return;
   }
 
-  let randomIndex = Math.floor(Math.random() * filteredQuotes.length);
-  let quote = filteredQuotes[randomIndex];
+  const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
+  const quote = filteredQuotes[randomIndex];
   quoteDisplay.innerHTML = `"${quote.text}" — (${quote.category})`;
+
+  saveLastQuote(quote); // optional
 }
 
-// Add a new quote dynamically
+// -------- Add Quote Function --------
 function addQuote(event) {
   event.preventDefault();
   const text = document.getElementById("newQuoteText").value.trim();
   const category = document.getElementById("newQuoteCategory").value.trim();
+  if (!text || !category) return alert("Enter both quote and category");
 
-  if (!text || !category) {
-    alert("Please enter both quote text and category.");
-    return;
-  }
+  const newQuote = { text, category };
+  quotes.push(newQuote);
+  saveQuotes();
 
-  quotes.push({ text, category });
-
-  // Add new category to dropdown if not exists
+  // Update category dropdown
   if (![...categorySelect.options].some(opt => opt.value.toLowerCase() === category.toLowerCase())) {
-    let newOption = document.createElement("option");
+    const newOption = document.createElement("option");
     newOption.value = category;
     newOption.innerHTML = category;
     categorySelect.appendChild(newOption);
@@ -55,7 +79,7 @@ function addQuote(event) {
   alert("New quote added successfully!");
 }
 
-// Create Add Quote form dynamically
+// -------- Create Add Quote Form Dynamically --------
 function createAddQuoteForm() {
   const formDiv = document.createElement("div");
 
@@ -81,9 +105,42 @@ function createAddQuoteForm() {
   addQuoteContainer.appendChild(formDiv);
 }
 
-// Event listener for showing random quote
-newQuoteBtn.addEventListener("click", showRandomQuote);
+// -------- JSON Export --------
+function exportToJson() {
+  const dataStr = JSON.stringify(quotes, null, 2);
+  const blob = new Blob([dataStr], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
 
-// Initialize
-showRandomQuote();
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "quotes.json";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// -------- JSON Import --------
+function importFromJsonFile(event) {
+  const fileReader = new FileReader();
+  fileReader.onload = function(e) {
+    try {
+      const importedQuotes = JSON.parse(e.target.result);
+      quotes.push(...importedQuotes);
+      saveQuotes();
+      alert("Quotes imported successfully!");
+      showRandomQuote();
+    } catch (err) {
+      alert("Invalid JSON file.");
+    }
+  };
+  fileReader.readAsText(event.target.files[0]);
+}
+
+// -------- Event Listeners --------
+newQuoteBtn.addEventListener("click", showRandomQuote);
+document.getElementById("exportBtn").addEventListener("click", exportToJson);
+document.getElementById("importFile").addEventListener("change", importFromJsonFile);
+
+// -------- Initialize --------
+loadQuotes();
 createAddQuoteForm();
+showRandomQuote();
