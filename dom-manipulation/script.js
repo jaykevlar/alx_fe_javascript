@@ -1,10 +1,10 @@
-// Quotes array
+// -------- Quotes Array --------
 let quotes = [
   { text: "The best way to predict the future is to create it.", category: "Motivation" },
   { text: "Life is what happens when you're busy making other plans.", category: "Life" }
 ];
 
-// DOM elements
+// -------- DOM Elements --------
 const quoteDisplay = document.getElementById("quoteDisplay");
 const categoryFilter = document.getElementById("categoryFilter");
 const addQuoteContainer = document.getElementById("addQuoteContainer");
@@ -58,8 +58,7 @@ function addQuote(event) {
   const newQuote = { text, category };
   quotes.push(newQuote);
   saveQuotes();
-
-  populateCategories(); // refresh categories dropdown
+  populateCategories();
 
   document.getElementById("newQuoteText").value = "";
   document.getElementById("newQuoteCategory").value = "";
@@ -67,7 +66,7 @@ function addQuote(event) {
   alert("New quote added successfully!");
 }
 
-// -------- Create Add Quote Form Dynamically --------
+// -------- Create Add Quote Form --------
 function createAddQuoteForm() {
   const formDiv = document.createElement("div");
 
@@ -165,10 +164,9 @@ function importFromJsonFile(event) {
   fileReader.readAsText(event.target.files[0]);
 }
 
-// -------- Simulated Server Interaction --------
+// -------- Server Sync --------
 const SERVER_URL = "https://jsonplaceholder.typicode.com/posts";
 
-// Fetch quotes from server (async/await)
 async function fetchQuotesFromServer() {
   try {
     const response = await fetch(SERVER_URL);
@@ -185,14 +183,13 @@ async function fetchQuotesFromServer() {
   }
 }
 
-// Sync local quotes to server (async/await)
 async function syncQuotes() {
   for (const quote of quotes) {
     try {
       await fetch(SERVER_URL, {
         method: "POST",
         body: JSON.stringify(quote),
-        headers: { "Content-type": "application/json; charset=UTF-8" }
+        headers: { "Content-Type": "application/json; charset=UTF-8" }
       });
     } catch (err) {
       console.error("Error syncing quotes to server:", err);
@@ -221,9 +218,9 @@ function notifyUser(count) {
   setTimeout(() => { syncNotification.textContent = ""; }, 5000);
 }
 
-// -------- Start Periodic Sync --------
-setInterval(fetchQuotesFromServer, 30000); // fetch every 30s
-setInterval(syncQuotes, 60000);             // push local changes every 60s
+// -------- Periodic Server Sync --------
+setInterval(fetchQuotesFromServer, 30000); // every 30s
+setInterval(syncQuotes, 60000);             // every 60s
 
 // -------- Initialize --------
 loadQuotes();
