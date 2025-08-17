@@ -12,12 +12,16 @@
   <div id="quoteDisplay"></div>
 
   <!-- Show Random Quote Button -->
-  <button id="newQuote">Show New Quote</button>
+  <button id="newQuote" onclick="showRandomQuote()">Show New Quote</button>
 
   <!-- Container for dynamically created Add Quote form -->
   <div id="addQuoteContainer"></div>
 
-  <!-- Optional: Category Filter -->
+  <!-- Export/Import -->
+  <button id="exportBtn" onclick="exportToJsonFile()">Export Quotes</button>
+  <input type="file" id="importFile" accept=".json" onchange="importFromJsonFile(event)" />
+
+  <!-- Category Filter -->
   <div>
     <label for="categorySelect">Filter by category:</label>
     <select id="categorySelect">
