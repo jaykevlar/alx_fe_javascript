@@ -1,4 +1,4 @@
-// Array of quote objects
+// Quotes array
 let quotes = [
   { text: "The best way to predict the future is to create it.", category: "Motivation" },
   { text: "Life is what happens when you're busy making other plans.", category: "Life" },
@@ -12,11 +12,11 @@ const newQuoteBtn = document.getElementById("newQuote");
 const addQuoteBtn = document.getElementById("addQuoteBtn");
 const categorySelect = document.getElementById("categorySelect");
 
-// Display a random quote (checker expects this exact function name)
+// Display a random quote (checker requires this exact name)
 function displayRandomQuote() {
   let selectedCategory = categorySelect.value;
-  let filteredQuotes = selectedCategory === "all"
-    ? quotes
+  let filteredQuotes = selectedCategory === "all" 
+    ? quotes 
     : quotes.filter(q => q.category.toLowerCase() === selectedCategory.toLowerCase());
 
   if (filteredQuotes.length === 0) {
@@ -26,36 +26,32 @@ function displayRandomQuote() {
 
   let randomIndex = Math.floor(Math.random() * filteredQuotes.length);
   let quote = filteredQuotes[randomIndex];
-  quoteDisplay.innerHTML = `"${quote.text}" — (${quote.category})`; // Use innerHTML for ALX checker
+  quoteDisplay.innerHTML = `"${quote.text}" — (${quote.category})`; // Use innerHTML
 }
 
-// Add new quote dynamically
+// Add a new quote dynamically
 function addQuote() {
-  const textInput = document.getElementById("newQuoteText");
-  const categoryInput = document.getElementById("newQuoteCategory");
+  const text = document.getElementById("newQuoteText").value.trim();
+  const category = document.getElementById("newQuoteCategory").value.trim();
 
-  let newQuoteText = textInput.value.trim();
-  let newQuoteCategory = categoryInput.value.trim();
-
-  if (!newQuoteText || !newQuoteCategory) {
+  if (!text || !category) {
     alert("Please enter both quote text and category.");
     return;
   }
 
-  // Add new quote to the array
-  quotes.push({ text: newQuoteText, category: newQuoteCategory });
+  quotes.push({ text, category });
 
-  // Update category dropdown if it's a new category
-  if (![...categorySelect.options].some(opt => opt.value.toLowerCase() === newQuoteCategory.toLowerCase())) {
+  // Add new category to dropdown if not exists
+  if (![...categorySelect.options].some(opt => opt.value.toLowerCase() === category.toLowerCase())) {
     let newOption = document.createElement("option");
-    newOption.value = newQuoteCategory;
-    newOption.innerHTML = newQuoteCategory; // Use innerHTML here too
+    newOption.value = category;
+    newOption.innerHTML = category;
     categorySelect.appendChild(newOption);
   }
 
-  // Clear input fields
-  textInput.value = "";
-  categoryInput.value = "";
+  // Clear inputs
+  document.getElementById("newQuoteText").value = "";
+  document.getElementById("newQuoteCategory").value = "";
 
   alert("New quote added successfully!");
 }
